@@ -51,7 +51,7 @@ void *fn_thread (void *num) {
         usleep(numero * 100000);
 
         pthread_mutex_lock(&mutex);
-        compteur ++;
+        compteur++;
         fprintf(stdout, "Thread %d : compteur = %d \n", numero, compteur);
         if (compteur >= 40) {
             pthread_mutex_unlock(&mutex);
