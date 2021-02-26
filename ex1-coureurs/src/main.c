@@ -41,7 +41,7 @@ void start_race(void);
 int main (int argc, char *argv[]) {
     int runners;                // number of runners participating in the race
     int i;                      // runner index
-    pthread_t *thread;          // thread aka runner array
+    pthread_t *threads;         // threads aka runners array
     struct race race;           // race description
     
     // test the args
@@ -58,7 +58,7 @@ int main (int argc, char *argv[]) {
     srand(time(NULL));
 
     // initialize the array of threads
-    thread = malloc(sizeof(pthread_t) * runners);
+    threads = malloc(sizeof(pthread_t) * runners);
 
     // initialize the semaphore used to pass the parameters to each thread
     sem_init(&race_params_sem, 0, 0);
@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
     start_race();
     for (i = 0; i < runners; i++) {
         race.runner_bib = i+1;
-        pthread_create(&thread[i], NULL, just_do_it, &race);
+        pthread_create(&_POSIX_THREAD_SPORADIC_SERVER[i], NULL, just_do_it, &race);
 
         // lock until the new thread has copy the race description
         sem_wait(&race_params_sem);
@@ -78,11 +78,11 @@ int main (int argc, char *argv[]) {
 
     // wait for each thread to exit before destroying the barrier
     for (i = 0; i < runners; i++) {
-        pthread_join(thread[i], NULL);
+        pthread_join(threads[i], NULL);
     }
 
     // free the semaphore & the barrier
-    free(thread);
+    free(threads);
     sem_destroy(&race_params_sem);
     free_barrier(race.barrier);
 
