@@ -70,7 +70,7 @@ int main (int argc, char *argv[]) {
     start_race();
     for (i = 0; i < runners; i++) {
         race.runner_bib = i+1;
-        pthread_create(&_POSIX_THREAD_SPORADIC_SERVER[i], NULL, just_do_it, &race);
+        pthread_create(&threads[i], NULL, just_do_it, &race);
 
         // lock until the new thread has copy the race description
         sem_wait(&race_params_sem);
@@ -102,14 +102,14 @@ void *just_do_it(void *params) {
     // run each stage
     for (i = 0; i < race.stages; i++) {
         sleep_time = rand() % 3000000 + 1;
-        printf(" - Runner %u starts stage %u\n", race.runner_bib, i+1);
+        printf("- Runner %u starts stage %u\n", race.runner_bib, i+1);
         usleep(sleep_time);
-        printf(" o Runner %u finished stage %u %10d us\n",
+        printf("o Runner %u finished stage %u %10dus\n",
                 race.runner_bib, i+1, sleep_time);
         barrier_wait(race.barrier);
     }
 
-    printf(" x Runner %u finished the race\n", race.runner_bib);
+    printf("x Runner %u finished the race\n", race.runner_bib);
 
     return NULL;
 }
