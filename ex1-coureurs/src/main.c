@@ -82,6 +82,7 @@ int main (int argc, char *argv[]) {
     }
 
     // free the semaphore & the barrier
+    free(thread);
     sem_destroy(&race_params_sem);
     free_barrier(race.barrier);
 
@@ -101,14 +102,14 @@ void *just_do_it(void *params) {
     // run each stage
     for (i = 0; i < race.stages; i++) {
         sleep_time = rand() % 3000000 + 1;
-        printf("Runner %u takes the start to reach stage %u\n", race.runner_bib, i+1);
+        printf(" - Runner %u starts stage %u\n", race.runner_bib, i+1);
         usleep(sleep_time);
-        printf("Runner %u waiting at stage %u %10d us\n",
+        printf(" o Runner %u finished stage %u %10d us\n",
                 race.runner_bib, i+1, sleep_time);
         barrier_wait(race.barrier);
     }
 
-    printf("Runner %u finished the race\n", race.runner_bib);
+    printf(" x Runner %u finished the race\n", race.runner_bib);
 
     return NULL;
 }
@@ -116,16 +117,16 @@ void *just_do_it(void *params) {
 void start_race(void) {
     puts("                                o");
     puts("                               /\\");
-    puts("                              /::\\");
-    puts("                             /::::\\");
-    puts("               ,a_a         /\\::::/\\");
-    puts("              {/ ''\\_      /\\ \\::/\\ \\");
-    puts("              {\\ ,_oo)    /\\ \\ \\/\\ \\ \\");
-    puts("              {/  (_^____/  \\ \\ \\ \\ \\ \\");
-    puts("    .=.      {/ \\___)))*)    \\ \\ \\ \\ \\/");
-    puts("   (.=.`\\   {/   /=;  ~/      \\ \\ \\ \\/");
-    puts("       \\ `\\{/(   \\/\\  /        \\ \\ \\/");
-    puts("        \\  `. `\\  ) )           \\ \\/");
+    puts("                              /\\/\\");
+    puts("                             /\\/\\/\\");
+    puts("               ,a_a         /\\/\\/\\/\\");
+    puts("              {/ ''\\_      /\\/\\/\\/\\/\\");
+    puts("              {\\ ,_oo)    /\\/\\/\\/\\/\\/\\");
+    puts("              {/  (_^____/  \\/\\/\\/\\/\\/\\");
+    puts("    .=.      {/ \\___)))*)    \\/\\/\\/\\/\\/");
+    puts("   (.=.`\\   {/   /=;  ~/      \\/\\/\\/\\/");
+    puts("       \\ `\\{/(   \\/\\  /        \\/\\/\\/");
+    puts("        \\  `. `\\  ) )           \\/\\/");
     puts("         \\    // /_/_            \\/");
     puts("          '==''---))))");
     puts(" ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
