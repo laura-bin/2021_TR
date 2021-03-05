@@ -1,11 +1,13 @@
 /** *************************************************************************************
  * Exercice 2 : Producteurs - Consommateurs
  * ========================================
+ * 
+ * Thread 1: reads a text file (arg1) and strores it in a first buffer
+ * Thread 2: reads the first buffer, processes the data and stores it in the second buffer
+ * Thread 3: reads the second buffer and displays it on the standard output
  *
- * Reading thread: reads a text file and stores in in the buf1 FIFO
- * Uppercase thread: reads the buf1 FIFO, and turn each character into uppercase
- *      before filling the buf2 FIFO
- * Display thread: reads the buf2 FIFO and display each character on the standard output
+ * arg[1]: text file name
+ * arg[2]: buffer size
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/

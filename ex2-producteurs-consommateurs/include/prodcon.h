@@ -3,7 +3,12 @@
  * Exercice 2 : Producteurs - Consommateurs
  * ========================================
  *
- * Threads parameters structures & functions prototypes
+ * Threads parameters structures
+ * Threads functions prototypes:
+ *  - reading thread: reads a text file and stores in in the buf1 FIFO
+ *  - process thread: reads the buf1 FIFO, and turn each character into uppercase
+ *      before filling the buf2 FIFO
+ *  - display thread: reads the buf2 FIFO and display each character on the standard output
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
@@ -31,7 +36,7 @@ struct display_thread_params {
 
 /**
  * Reading thread
- * reads a text file and stores in in the buf1 FIFO
+ * reads a text file and stores each character into the buf1 FIFO
  * 
  * @param params
  */
@@ -39,7 +44,7 @@ void *read_fifo(void *read_thread_params);
 
 /**
  * Uppercase thread
- * reads the buf1 FIFO, and turn each character into uppercase
+ * reads the buf1 FIFO, and turns each character into uppercase
  * before filling the buf2 FIFO
  * 
  * @param params
@@ -48,7 +53,7 @@ void *process_fifo(void *process_thread_params);
 
 /**
  * Display thread
- * rreads the buf2 FIFO and display each character
+ * reads the buf2 FIFO and displays each character
  * on the standard output
  * 
  * @param params

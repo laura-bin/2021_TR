@@ -2,9 +2,11 @@
  * Exercice 2 : Producteurs - Consommateurs
  * ========================================
  *
- * FIFO:
+ * FIFO queue access implementation:
  *  - push a new item in the FIFO queue
  *  - pop an item from the FIFO queue
+ * 
+ * FIFO queue creation and deletion implementation:
  *  - initialize a new FIFO queue
  *  - free a FIFO queue
  * 
@@ -37,7 +39,7 @@ void push(char item, struct fifo *fifo) {
     // unlock the access to the buffer
     sem_post(&fifo->mutex);
 
-    // notify a new item available
+    // notify the availability of a new item 
     sem_post(&fifo->items);
 }
 
@@ -65,7 +67,7 @@ char pop(struct fifo *fifo) {
     // unlock the access to the buffer
     sem_post(&fifo->mutex);
 
-    // notify a new free space
+    // notify the availability of a new free space 
     sem_post(&fifo->spaces);
 
     return item;

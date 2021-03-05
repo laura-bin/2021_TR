@@ -3,9 +3,13 @@
  * Exercice 2 : Producteurs - Consommateurs
  * ========================================
  *
- *  - FIFO structure
+ * FIFO queue structure
+ * 
+ * FIFO queue access functions prototypes:
  *  - push a new item in the FIFO queue
  *  - pop an item from the FIFO queue
+ * 
+ * FIFO queue creation and deletion:
  *  - initialize a new FIFO queue
  *  - free a FIFO queue
  * 
@@ -16,21 +20,23 @@
 
 #define BUFFER_SIZE 10
 
+/* FIFO queue structure */
 struct fifo {
     char *buffer;               // circular buffer
     unsigned buffer_size;       // circular buffer size
     unsigned input;             // next available input index
     unsigned output;            // first available output index
     sem_t mutex;                // enforces exclusice access to the buffer
-    sem_t items;                // number of items stored in the buffer
-    sem_t spaces;               // number of free spaces in the buffer
+    sem_t items;                // items stored in the buffer
+    sem_t spaces;               // free spaces in the buffer
 };
 
 /**
  * Pushes a new item into the FIFO queue
+ * blocks the thread in no free space is available
  * 
- * @param item: new item to add in the queue
- * @param fifo: FIFO queue in which push the new item
+ * @param item: new item to push in the queue
+ * @param fifo: queue in which push the new item
  */
 void push(char item, struct fifo *fifo);
 
@@ -49,7 +55,7 @@ char pop(struct fifo *fifo);
  * 
  * @param buffer_size: number of elements in the circular buffer
  * 
- * @return the pointer of the FIFO queue created
+ * @return the new FIFO queue pointer
  */
 struct fifo *init_fifo(unsigned buffer_size);
 
