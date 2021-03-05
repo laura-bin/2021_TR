@@ -1,0 +1,19 @@
+@startuml prodcon-push-sequence
+
+!include ./theme.plantuml
+
+participant "Thread" as thread
+participant "FIFO" as buf
+
+activate thread
+activate buf
+
+thread -> buf : push(item)
+buf -> buf : wait(spaces)
+group locked
+    buf->buf : buffer[input] = item\ninput++
+end
+buf -> buf : post(items)
+buf -> thread
+
+@enduml

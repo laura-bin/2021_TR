@@ -22,4 +22,5 @@ set(SOURCE_FILES
 find_package(Threads REQUIRED)
 
 add_executable(prodcon ${SOURCE_FILES})
+
 target_link_libraries(prodcon PRIVATE Threads::Threads)

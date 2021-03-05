@@ -1,0 +1,73 @@
+@startuml prodcon-full-sequence
+
+!include ./theme.plantuml
+
+participant "Text file" as text
+participant "main" as main
+participant "Thread 1\nRead" as read
+participant "Thread 2\nProcess" as process
+participant "Thread 3\nDisplay" as display
+participant "Thread 3\nDisplay" as display
+participant "FIFO 1" as buf1
+participant "FIFO 2" as buf2
+participant "standard\noutput" as stdout
+
+activate stdout
+activate main
+
+main -> text : open
+activate text
+
+main -> buf1 : creation
+activate buf1
+
+main -> buf2 : creation
+activate buf2
+
+main -> read : creation
+activate read
+main -> process : creation
+activate process
+main -> display : creation
+activate display
+
+
+loop item != EOF
+    read -> text : getc()
+    text -> read : item
+    read -> buf1 : push(item)
+    ref over buf1 : push sequence
+    buf1 -> read
+end
+read -> text : close
+deactivate text
+read -> buf1 : push(EOF)
+ref over buf1 : push sequence
+buf1 -> read
+deactivate read
+
+loop item != EOF
+    process -> buf1 : pop()
+    ref over buf1 : pop sequence
+    buf1 -> process : item
+
+    process -> process : process item
+
+    process -> buf2 : push(item)
+    ref over buf2 : push sequence
+    buf2 -> process
+end
+process -> buf2 : push(EOF)
+ref over buf2 : push sequence
+buf2 -> process
+deactivate process
+
+loop item != EOF
+    display -> buf2 : pop()
+    ref over buf2 : pop sequence
+    buf2 -> display : item
+    display -> stdout : item
+end
+deactivate display
+
+@enduml

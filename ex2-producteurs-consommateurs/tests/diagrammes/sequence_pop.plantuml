@@ -1,0 +1,19 @@
+@startuml prodcon-pop-sequence
+
+!include ./theme.plantuml
+
+participant "Thread" as thread
+participant "FIFO" as buf
+
+activate thread
+activate buf
+
+thread -> buf : pop()
+buf -> buf : wait(items)
+group locked
+    buf->buf : item = buffer[output]\noutput++
+end
+buf -> buf : post(spaces)
+buf -> thread : item
+
+@enduml
