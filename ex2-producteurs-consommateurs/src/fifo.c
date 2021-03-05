@@ -39,7 +39,7 @@ void push(char item, struct fifo *fifo) {
     // unlock the access to the buffer
     sem_post(&fifo->mutex);
 
-    // notify the availability of a new item 
+    // notify the availability of a new item
     sem_post(&fifo->items);
 }
 

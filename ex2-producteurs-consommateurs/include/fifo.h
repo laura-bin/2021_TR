@@ -18,7 +18,7 @@
 
 #include <semaphore.h>
 
-#define BUFFER_SIZE 10
+#define MAX_BUFFER_SIZE 1000000000
 
 /* FIFO queue structure */
 struct fifo {

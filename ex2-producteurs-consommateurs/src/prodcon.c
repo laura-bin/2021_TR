@@ -39,11 +39,9 @@ int main (int argc, char *argv[]) {
 
     // get the filename
     strncpy(filename, argv[1], 255);
-    buffer_size = atoi(argv[2]);
-
-    // if buffer size is not greater than 0, stop the program
-    if (buffer_size < 1) {
-        fprintf(stderr, "buffer size must be greter than 0\n");
+    if ((buffer_size = atoi(argv[2])) == -1 || buffer_size < 1
+            || buffer_size > MAX_BUFFER_SIZE) {
+        fprintf(stderr, "buffer size [1-%d]\n", MAX_BUFFER_SIZE);
         return 1;
     }
 
@@ -89,10 +87,12 @@ void *read_fifo(void *read_thread_params) {
         push(item, params->buf1);
     }
 
+    // close the text file
+    fclose(params->fp);
+
     // keep EOF to end next theard
     push(item, params->buf1);
 
-    fclose(params->fp);
     return NULL;
 }
 
