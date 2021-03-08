@@ -24,14 +24,17 @@ void *read_thread(void *read_thread_params) {
     sleep_time = rand() % 2000 + 1;
     usleep(sleep_time);
 
-    // turn the lightswitch on (the first reader in locks the access to the data)
-    lock_lightswitch(params.ls, params.free_access);
+    // hold the no writer mutex
+    sem_wait(params.no_readers_mutex);
+    lock_lightswitch(params.read_switch, params.no_writers_mutex);
+    sem_post(params.no_readers_mutex);
 
     // critical section: read the data
     params.read_data(params.data, params.reader_id);
 
     // turn off the lightswitch (the last reader out unlocks the access to the data)
-    unlock_lightswitch(params.ls, params.free_access);
+    // unlock no writer mutex (authorize writers to enter the critical section)
+    unlock_lightswitch(params.read_switch, params.no_writers_mutex);
 
     return NULL;
 }
@@ -47,15 +50,17 @@ void *write_thread(void *write_thread_params) {
     sleep_time = rand() % 1000 + 1;
     usleep(sleep_time);
 
-    // wait for the critical section to be empty
-    sem_wait(params.free_access);
+    // hold the no reader mutex & no writer mutex
+    // multiple writers can queue on no writer mutex and readers are blocked
+    lock_lightswitch(params.write_switch, params.no_readers_mutex);
+    sem_wait(params.no_writers_mutex);
+
     // puts("Critical section is locked by a writer");
 
     // critical section: increment the data
     params.write_data(params.data, params.writer_id, params.writer_id);
 
-    // signal the critical section is empty
-    sem_post(params.free_access);
+    unlock_lightswitch(params.write_switch, params.no_readers_mutex);
     // puts("Critical section is free");
 
     return NULL;    
