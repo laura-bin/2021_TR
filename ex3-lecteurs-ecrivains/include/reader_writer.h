@@ -1,0 +1,49 @@
+#pragma once
+/** *************************************************************************************
+ * Exercice 3 : Lecteurs - Ecrivains
+ * =================================
+ * 
+ * Threads parameters structures and threads functions
+ * 
+ * TR 2021 - Laura Binacchi
+ ***************************************************************************************/
+
+#include "data.h"
+#include "lightswitch.h"
+
+#define THREAD_COUNT 2
+
+/* Read thread parameters */
+struct read_thread_params {
+    int reader_id;          // thread id
+    struct data *data;      // data structure shared by all the threads
+    sem_t *free_access;      // 1 if the access to the data is unlocked, 0 otherwise // critical section mutex
+    struct lightswitch *ls; // 
+    void (*read_data)(struct data *data, int reader_id);
+    sem_t *params_mutex;
+    int readers_count;
+};
+
+/* Write thread parameters */
+struct write_thread_params {
+    int writer_id;          // thread id
+    struct data *data;      // data structure shared by all the threads
+    sem_t *free_access;      // 1 if the access to the data is unlocked, 0 otherwise
+    void (*write_data)(struct data *data, int value, int writer_id);
+    sem_t *params_mutex;
+    int writers_count;
+};
+
+/**
+ * Reading thread:
+ * 
+ * @param read_thread_params
+ */
+void *read_thread(void *read_thread_params);
+
+/**
+ * Writing thread:
+ * 
+ * @param write_thread_params
+ */
+void *write_thread(void *write_thread_params);
