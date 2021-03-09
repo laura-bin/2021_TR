@@ -4,8 +4,8 @@
  * 
  * Data structure functions implementation:
  *  - creation and deletion
- *  - read access
- *  - write access
+ *  - read data
+ *  - write data
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
@@ -30,16 +30,10 @@ void free_data(struct data *data) {
 }
 
 void read_data(struct data *data, int reader_id) {
-    printf("reader %d reads %3d\n", reader_id, data->count);
+    printf("reader %d reads %3d\n", reader_id, data->counter);
 }
 
-/**
- * Increments data counter with a given value
- * 
- * @param data
- * @param value
- */
 void write_data(struct data *data, int value, int writer_id) {
-    data->count += value;
-    printf("writer %d writes %3d TOTAL> %3d\n", writer_id, value, data->count);
+    data->counter += value;
+    printf("writer %d writes %3d TOTAL> %3d\n", writer_id, value, data->counter);
 }

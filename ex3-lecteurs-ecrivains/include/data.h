@@ -5,14 +5,14 @@
  * 
  * Data structure:
  *  - creation and deletion
- *  - read access
- *  - write access
+ *  - read data
+ *  - write data
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
 
 struct data {
-    int count;
+    int counter;
 };
 
 /**
@@ -41,7 +41,7 @@ void free_data(struct data *data);
 void read_data(struct data *data, int reader_id);
 
 /**
- * Increments data counter with a given value
+ * Increments the data counter with a given value
  * 
  * @param data: data structure to increment
  * @param value: increment value
