@@ -1,6 +1,9 @@
 # compilation in release mode
 # cmake -DCMAKE_BUILD_TYPE=Release ..
 
+# add information about source code
+# cmake -DCMAKE_C_FLAGS=-g ..
+
 # gdb ./main
 # r / run
 # bt / backtrace
