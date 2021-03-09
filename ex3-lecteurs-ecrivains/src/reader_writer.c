@@ -23,17 +23,16 @@ void *read_thread(void *read_thread_params) {
     sleep_time = rand() % 2000 + 1;
     usleep(sleep_time);
 
-    // hold the no writer mutex
-    sem_wait(params.no_readers_mutex);
-    lock_lightswitch(params.read_switch, params.no_writers_mutex);
-    sem_post(params.no_readers_mutex);
+    // hold the no writer semaphore
+    sem_wait(params.no_readers);
+    lock_lightswitch(params.ls, params.no_writers);
+    sem_post(params.no_readers);
 
     // critical section: read the data
-    params.read_data(params.data, params.reader_id);
+    params.read_data(params.shared_data, params.reader_id);
 
-    // turn off the lightswitch (the last reader out unlocks the access to the data)
-    // unlock no writer mutex (authorize writers to enter the critical section)
-    unlock_lightswitch(params.read_switch, params.no_writers_mutex);
+    // turn off the lightswitch (authorize the writers to update to the data)
+    unlock_lightswitch(params.ls, params.no_writers);
 
     return NULL;
 }
@@ -48,16 +47,17 @@ void *write_thread(void *write_thread_params) {
     sleep_time = rand() % 1000 + 1;
     usleep(sleep_time);
 
-    // hold the no reader mutex & no writer mutex
-    // multiple writers can queue on no writer mutex and readers are blocked
-    lock_lightswitch(params.write_switch, params.no_readers_mutex);
-    sem_wait(params.no_writers_mutex);
+    // hold the no reader & no writer semaphores
+    // multiple writers can queue on no writer semaphore and readers are blocked
+    lock_lightswitch(params.ls, params.no_readers);
+    sem_wait(params.no_writers);
 
     // critical section: increment the data
-    params.write_data(params.data, params.writer_id, params.writer_id);
+    params.write_data(params.shared_data, params.writer_id, params.writer_id);
 
-    sem_post(params.no_writers_mutex);
-    unlock_lightswitch(params.write_switch, params.no_readers_mutex);
+    // turn off the lightswitch (authorize readers to access the data)
+    sem_post(params.no_writers);
+    unlock_lightswitch(params.ls, params.no_readers);
 
     return NULL;    
 }

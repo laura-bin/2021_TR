@@ -13,47 +13,31 @@
 
 /* Read thread parameters */
 struct read_thread_params {
-    int reader_id;          // thread id
-    struct data *data;      // data structure shared by all the threads
-    sem_t *free_access;      // 1 if the access to the data is unlocked, 0 otherwise // critical section mutex
-    struct lightswitch *ls; // 
+    int reader_id;              // thread id
+    int readers_count;          // number of threads
+    struct data *shared_data;   // data structure shared by readers and writers
     void (*read_data)(struct data *data, int reader_id);
-    // sem_t *params_mutex;
-    int readers_count;
-    struct lightswitch *read_switch;    // counts the readers in the critical section
-    struct lightswitch *write_switch;    // counts the readers in the critical section
-    sem_t *data_access_mutex;   // = roomEmpty
-    sem_t *turnstile_mutex;     // turnstile for readers and mutex for writers
-    // sem_t *mutex;     // turnstile for readers and mutex for writers
-    sem_t *no_readers_mutex;
-    sem_t *no_writers_mutex;
-
-
-
-    pthread_mutex_t *mutex; // parameters copy mutex
+    sem_t *no_readers;          // 1 if no reader is in the critical section (shared)
+    sem_t *no_writers;          // 1 if no writer is in the critical section (shared)
+    struct lightswitch *ls;     // readers lightswitch (counts the readers in the critical section)
+    pthread_mutex_t *mutex;     // parameters copy mutex
 };
 
 /* Write thread parameters */
 struct write_thread_params {
-    int writer_id;          // thread id
-    struct data *data;      // data structure shared by all the threads
-    sem_t *free_access;      // 1 if the access to the data is unlocked, 0 otherwise
+    int writer_id;              // thread id
+    int writers_count;          // number of threads
+    struct data *shared_data;   // data structure shared by readers and writers
     void (*write_data)(struct data *data, int value, int writer_id);
-    // sem_t *params_mutex;
-    int writers_count;
-    struct lightswitch *read_switch;    // counts the readers in the critical section
-    struct lightswitch *write_switch;    // counts the readers in the critical section
-    sem_t *data_access_mutex;   // = roomEmpty
-    sem_t *turnstile_mutex;     // turnstile for readers and mutex for writers
-    // sem_t *mutex;     // turnstile for readers and mutex for writers
-    sem_t *no_readers_mutex;
-    sem_t *no_writers_mutex;
-
-    pthread_mutex_t *mutex; // parameters copy mutex
+    sem_t *no_readers;          // 1 if no reader is in the critical section (shared)
+    sem_t *no_writers;          // 1 if no writer is in the critical section (shared)
+    struct lightswitch *ls;     // writers lightswitch (counts the writers in the critical section)
+    pthread_mutex_t *mutex;     // parameters copy mutex
 };
 
 /**
  * Reading thread:
+ * multiple readers can access the data as long as there is no writer in the queue
  * 
  * @param read_thread_params
  */
@@ -61,6 +45,8 @@ void *read_thread(void *read_thread_params);
 
 /**
  * Writing thread:
+ * multiple writers can update the data and block the reading access
+ * (as long as a writer is in the queue, no reader can access the data)
  * 
  * @param write_thread_params
  */

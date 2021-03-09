@@ -43,8 +43,6 @@ void *create_readers(void *read_params) {
         pthread_mutex_lock(params->mutex);
     }
 
-    printf("readers, done\n");
-
     // wait for each thread to exit before destroying the FIFO queues
     for (i = 0; i < params->readers_count; i++) {
         pthread_join(read_threads[i], NULL);
@@ -72,8 +70,6 @@ void *create_writers(void *write_params) {
         pthread_mutex_lock(params->mutex);
     }
 
-    printf("writers, done\n");
-
     // wait for each thread to exit before destroying the FIFO queues
     for (i = 0; i < params->writers_count; i++) {
         pthread_join(write_threads[i], NULL);
@@ -85,18 +81,12 @@ void *create_writers(void *write_params) {
 int main (int argc, char *argv[]) {
     struct read_thread_params read_params;
     struct write_thread_params write_params;
-    sem_t free_data_access;
     pthread_t reader_creator;
     pthread_t writer_creator;
-    struct lightswitch *reader_ls;
-    struct lightswitch *writer_ls;
-    sem_t data_access_mutex;
-    sem_t turnstile;
-    sem_t mutex;
-    sem_t no_readers_mutex;
-    sem_t no_writers_mutex;
     pthread_mutex_t reader_params;
     pthread_mutex_t writer_params;
+    sem_t no_readers;
+    sem_t no_writers;
 
     // test the args
     if (argc != 3) {
@@ -117,6 +107,45 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "invalid writers count\n");
     }
 
+    // initialize reader id
+    read_params.reader_id = 0;
+
+    // initialize writer id
+    write_params.writer_id = 0;
+
+    // initialize the shared data
+    read_params.shared_data = write_params.shared_data = init_data();
+    if (read_params.shared_data == NULL) {
+        perror("data initialization");
+        return 1;
+    }
+
+    // initialize the read function
+    read_params.read_data = read_data;
+
+    // initialize the write function
+    write_params.write_data = write_data;
+
+    // initialize the shared readers turnstile
+    sem_init(&no_readers, 0, 1);
+    read_params.no_readers = write_params.no_readers = &no_readers;
+
+    // initialize the shared writers turnstile
+    sem_init(&no_writers, 0, 1);
+    read_params.no_writers = write_params.no_writers = &no_writers;
+
+    // initialize the readers lightswitch
+    read_params.ls = init_lightswitch();
+    if (read_params.ls == NULL) {
+        perror("readers lightswitch initialization");
+    }
+
+    // initialize the writers lightswitch
+    write_params.ls = init_lightswitch();
+    if (write_params.ls == NULL) {
+        perror("writers lightswitch initialization");
+    }
+
     // initialize the read parameters copy mutex
     pthread_mutex_init(&reader_params, NULL);
     read_params.mutex = &reader_params;
@@ -124,44 +153,6 @@ int main (int argc, char *argv[]) {
     // initialize the write parameters copy mutex
     pthread_mutex_init(&writer_params, NULL);
     write_params.mutex = &writer_params;
-
-
-    
-    read_params.reader_id = 0;
-    write_params.writer_id = 0;
-
-    read_params.data = write_params.data = init_data();
-
-    sem_init(&free_data_access, 0, 1);
-    read_params.free_access = write_params.free_access = &free_data_access;
-
-    read_params.ls = init_lightswitch();
-
-    read_params.read_data = read_data;
-    write_params.write_data = write_data;
-
-    sem_init(&data_access_mutex, 0, 1);
-    read_params.data_access_mutex = write_params.data_access_mutex = &data_access_mutex;
- 
-    sem_init(&turnstile, 0, 1);
-    read_params.turnstile_mutex = write_params.turnstile_mutex = &turnstile;
-
-    reader_ls = init_lightswitch();
-    read_params.read_switch = write_params.read_switch = reader_ls;
-
-    writer_ls = init_lightswitch();
-    read_params.write_switch = write_params.write_switch = writer_ls;
-
-    sem_init(&mutex, 0, 1);
-    read_params.turnstile_mutex = write_params.turnstile_mutex = &mutex;
-    sem_init(&no_readers_mutex, 0, 1);
-    read_params.no_readers_mutex = write_params.no_readers_mutex = &no_readers_mutex;
-    sem_init(&no_writers_mutex, 0, 1);
-    read_params.no_writers_mutex = write_params.no_writers_mutex = &no_writers_mutex;
-
-
-     
-
 
     pthread_create(&reader_creator, NULL, create_readers, &read_params);
     pthread_create(&writer_creator, NULL, create_writers, &write_params);
