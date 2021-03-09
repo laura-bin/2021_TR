@@ -10,12 +10,13 @@
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
 
+#include <pthread.h>
 #include <semaphore.h>
 
 /* Lightswitch structure */
 struct lightswitch {
-    int thread_count;       // number of threads in the critical section
-    sem_t mutex;            // thread count mutex
+    int counter;                    // number of threads in the critical section
+    pthread_mutex_t counter_mutex;  // thread counter mutex
 };
 
 /**
@@ -38,16 +39,16 @@ void free_lightswitch(struct lightswitch *lightswitch);
  * Locks the critical section:
  * the first thread entering into the critical section locks the access
  * 
- * @param ligthswitch
- * @param free_access
+ * @param lightswitch used to keep count of the entering threads
+ * @param semaphore to lock
  */
-void lock_lightswitch(struct lightswitch *lightswitch, sem_t *free_access);
+void lock_lightswitch(struct lightswitch *lightswitch, sem_t *semaphore);
 
 /**
  * Unlocks the critical section:
  * the last thread leaving the critical section locks the access
  * 
- * @param ligthswitch
- * @param free_access
+ * @param ligthswitch used to keep count of the leaving threads
+ * @param semaphore to unlock
  */
-void unlock_lightswitch(struct lightswitch *lightswitch, sem_t *free_access);
+void unlock_lightswitch(struct lightswitch *lightswitch, sem_t *semaphore);
