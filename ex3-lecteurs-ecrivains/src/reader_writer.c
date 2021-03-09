@@ -14,12 +14,11 @@
 #include "reader_writer.h"
 
 void *read_thread(void *read_thread_params) {
-    int i;
     int sleep_time;
 
     // copy the parameters then unlock the mutex
     struct read_thread_params params = *((struct read_thread_params *)read_thread_params);
-    sem_post(params.params_mutex);
+    pthread_mutex_unlock(params.mutex);
 
     sleep_time = rand() % 2000 + 1;
     usleep(sleep_time);
@@ -40,12 +39,11 @@ void *read_thread(void *read_thread_params) {
 }
 
 void *write_thread(void *write_thread_params) {
-    int i;
     int sleep_time;
 
     // copy the parameters then unlock the mutex
     struct write_thread_params params = *((struct write_thread_params *)write_thread_params);
-    sem_post(params.params_mutex);
+    pthread_mutex_unlock(params.mutex);
     
     sleep_time = rand() % 1000 + 1;
     usleep(sleep_time);
@@ -55,13 +53,11 @@ void *write_thread(void *write_thread_params) {
     lock_lightswitch(params.write_switch, params.no_readers_mutex);
     sem_wait(params.no_writers_mutex);
 
-    // puts("Critical section is locked by a writer");
-
     // critical section: increment the data
     params.write_data(params.data, params.writer_id, params.writer_id);
 
+    sem_post(params.no_writers_mutex);
     unlock_lightswitch(params.write_switch, params.no_readers_mutex);
-    // puts("Critical section is free");
 
     return NULL;    
 }

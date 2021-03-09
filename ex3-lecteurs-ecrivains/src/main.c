@@ -34,13 +34,16 @@ void *create_readers(void *read_params) {
         exit(1);
     }
 
+    pthread_mutex_lock(params->mutex);
     for (i = 0; i < params->readers_count; i++) {
         params->reader_id++;
         pthread_create(&read_threads[i], NULL, read_thread, params);
 
         // lock until the new thread has copy the race description
-        sem_wait(params->params_mutex);
+        pthread_mutex_lock(params->mutex);
     }
+
+    printf("readers, done\n");
 
     // wait for each thread to exit before destroying the FIFO queues
     for (i = 0; i < params->readers_count; i++) {
@@ -60,13 +63,16 @@ void *create_writers(void *write_params) {
         exit(1);
     }
 
+    pthread_mutex_lock(params->mutex);
     for (i = 0; i < params->writers_count; i++) {
         params->writer_id++;
         pthread_create(&write_threads[i], NULL, write_thread, params);
 
         // lock until the new thread has copy the race description
-        sem_wait(params->params_mutex);
+        pthread_mutex_lock(params->mutex);
     }
+
+    printf("writers, done\n");
 
     // wait for each thread to exit before destroying the FIFO queues
     for (i = 0; i < params->writers_count; i++) {
@@ -80,8 +86,6 @@ int main (int argc, char *argv[]) {
     struct read_thread_params read_params;
     struct write_thread_params write_params;
     sem_t free_data_access;
-    sem_t read_params_mutex;
-    sem_t write_params_mutex;
     pthread_t reader_creator;
     pthread_t writer_creator;
     struct lightswitch *reader_ls;
@@ -91,6 +95,8 @@ int main (int argc, char *argv[]) {
     sem_t mutex;
     sem_t no_readers_mutex;
     sem_t no_writers_mutex;
+    pthread_mutex_t reader_params;
+    pthread_mutex_t writer_params;
 
     // test the args
     if (argc != 3) {
@@ -111,10 +117,15 @@ int main (int argc, char *argv[]) {
         fprintf(stderr, "invalid writers count\n");
     }
 
-    sem_init(&read_params_mutex, 0, 0);
-    sem_init(&write_params_mutex, 0, 0);
-    read_params.params_mutex = &read_params_mutex;
-    write_params.params_mutex = &write_params_mutex;
+    // initialize the read parameters copy mutex
+    pthread_mutex_init(&reader_params, NULL);
+    read_params.mutex = &reader_params;
+
+    // initialize the write parameters copy mutex
+    pthread_mutex_init(&writer_params, NULL);
+    write_params.mutex = &writer_params;
+
+
     
     read_params.reader_id = 0;
     write_params.writer_id = 0;
@@ -145,7 +156,7 @@ int main (int argc, char *argv[]) {
     read_params.turnstile_mutex = write_params.turnstile_mutex = &mutex;
     sem_init(&no_readers_mutex, 0, 1);
     read_params.no_readers_mutex = write_params.no_readers_mutex = &no_readers_mutex;
-    sem_init(&turnstile, 0, 1);
+    sem_init(&no_writers_mutex, 0, 1);
     read_params.no_writers_mutex = write_params.no_writers_mutex = &no_writers_mutex;
 
 
