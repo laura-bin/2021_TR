@@ -2,10 +2,10 @@
  * Exercice 3 : Lecteurs - Ecrivains
  * =================================
  * 
- * Reader threads: can be in teh critical section simultaneously
+ * Reader threads: can be in the critical section simultaneously
  * Writer threads: have exclusive and priority access to the critical section
  * 
- *  - readers must outnumber writers
+ *  - readers should outnumber writers
  *  - the number of readers and the number of writers must be greater than 0
  *  - data counter is initialized at 0 and max value must be greater than 0
  *
@@ -41,11 +41,11 @@ void *create_readers(void *read_params) {
         params->reader_id++;
         pthread_create(&read_threads[i], NULL, read_thread, params);
 
-        // lock until the new thread has copy the race description
+        // lock until the new thread has copied the parameters passed
         pthread_mutex_lock(params->mutex);
     }
 
-    // wait for each thread to exit before destroying the FIFO queues
+    // wait for each thread to exit
     for (i = 0; i < params->readers_count; i++) {
         pthread_join(read_threads[i], NULL);
     }
@@ -70,11 +70,11 @@ void *create_writers(void *write_params) {
         params->writer_id++;
         pthread_create(&write_threads[i], NULL, write_thread, params);
 
-        // lock until the new thread has copy the race description
+        // lock until the new thread has copied the parameters passed
         pthread_mutex_lock(params->mutex);
     }
 
-    // wait for each thread to exit before destroying the FIFO queues
+    // wait for each thread to exit
     for (i = 0; i < params->writers_count; i++) {
         pthread_join(write_threads[i], NULL);
     }
@@ -198,9 +198,6 @@ int main (int argc, char *argv[]) {
 
     pthread_join(writer_creator, NULL);
     pthread_join(reader_creator, NULL);
-
-
-
 
     end_free_write_params_mutex:
     pthread_mutex_destroy(&writer_params);

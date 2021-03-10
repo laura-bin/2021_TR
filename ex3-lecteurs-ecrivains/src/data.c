@@ -30,14 +30,16 @@ void free_data(struct data *data) {
     free(data);
 }
 
-void read_data(struct data *data, int reader_id) {
+int read_data(struct data *data, int reader_id) {
     printf("reader %d reads %3d\n", reader_id, data->counter);
+    return data->counter < data->max ? 0 : 1;
 }
 
-void write_data(struct data *data, int value, int writer_id) {
+int write_data(struct data *data, int value, int writer_id) {
     data->counter += value;
     if (data->counter > data->max) {
         data->counter = data->max;
     }
     printf("writer %d writes %3d TOTAL> %3d\n", writer_id, value, data->counter);
+    return data->counter < data->max ? 0 : 1;
 }

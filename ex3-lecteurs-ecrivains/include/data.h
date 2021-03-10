@@ -38,8 +38,12 @@ void free_data(struct data *data);
  * 
  * @param data: data to display
  * @param reader_id: calling thread id
+ * 
+ * @return either
+ *      0 if the counter is less than max
+ *      1 if the counter is greater than or equal to the value
  */
-void read_data(struct data *data, int reader_id);
+int read_data(struct data *data, int reader_id);
 
 /**
  * Increments the data counter with a given value
@@ -48,5 +52,9 @@ void read_data(struct data *data, int reader_id);
  * @param data: data structure to increment
  * @param value: increment value
  * @param writer_id: calling thread id
+ * 
+ * @return either
+ *      0 if the counter is less than max
+ *      1 if the counter is greater than or equal to the value
  */
-void write_data(struct data *data, int value, int writer_id);
+int write_data(struct data *data, int value, int writer_id);

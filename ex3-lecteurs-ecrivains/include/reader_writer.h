@@ -16,7 +16,7 @@ struct read_thread_params {
     int reader_id;              // thread id
     int readers_count;          // number of threads
     struct data *shared_data;   // data structure shared by readers and writers
-    void (*read_data)(struct data *data, int reader_id);
+    int (*read_data)(struct data *data, int reader_id);
     sem_t *no_readers;          // 1 if no reader is in the critical section (shared)
     sem_t *no_writers;          // 1 if no writer is in the critical section (shared)
     struct lightswitch *ls;     // readers lightswitch (counts the readers in the critical section)
@@ -28,7 +28,7 @@ struct write_thread_params {
     int writer_id;              // thread id
     int writers_count;          // number of threads
     struct data *shared_data;   // data structure shared by readers and writers
-    void (*write_data)(struct data *data, int value, int writer_id);
+    int (*write_data)(struct data *data, int value, int writer_id);
     sem_t *no_readers;          // 1 if no reader is in the critical section (shared)
     sem_t *no_writers;          // 1 if no writer is in the critical section (shared)
     struct lightswitch *ls;     // writers lightswitch (counts the writers in the critical section)
