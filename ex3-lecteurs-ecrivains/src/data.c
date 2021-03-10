@@ -16,12 +16,13 @@
 
 #include "data.h"
 
-struct data *init_data(void) {
+struct data *init_data(int max) {
     struct data *data = malloc(sizeof(struct data));
     if (data == NULL) {
         return NULL;
     }
     memset(data, 0, sizeof(struct data));
+    data->max = max;
     return data;
 }
 
@@ -35,5 +36,8 @@ void read_data(struct data *data, int reader_id) {
 
 void write_data(struct data *data, int value, int writer_id) {
     data->counter += value;
+    if (data->counter > data->max) {
+        data->counter = data->max;
+    }
     printf("writer %d writes %3d TOTAL> %3d\n", writer_id, value, data->counter);
 }

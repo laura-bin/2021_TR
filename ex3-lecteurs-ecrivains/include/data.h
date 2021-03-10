@@ -13,17 +13,18 @@
 
 struct data {
     int counter;
+    int max;
 };
 
 /**
  * Initializes a data structure:
- * sets the counter to 0
+ * sets the counter to 0 and the max value
  * 
  * @return either
  *      the data structure created
  *      NULL if an error occured (errno is set)
  */
-struct data *init_data(void);
+struct data *init_data(int max);
 
 /**
  * Frees a data structure
@@ -42,6 +43,7 @@ void read_data(struct data *data, int reader_id);
 
 /**
  * Increments the data counter with a given value
+ * (limited to the max value)
  * 
  * @param data: data structure to increment
  * @param value: increment value
