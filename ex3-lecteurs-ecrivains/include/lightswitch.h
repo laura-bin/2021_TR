@@ -46,7 +46,7 @@ void lock_lightswitch(struct lightswitch *lightswitch, sem_t *semaphore);
 
 /**
  * Unlocks the critical section:
- * the last thread leaving the critical section locks the access
+ * the last thread leaving the critical section unlocks the access
  * 
  * @param ligthswitch used to keep count of the leaving threads
  * @param semaphore to unlock
