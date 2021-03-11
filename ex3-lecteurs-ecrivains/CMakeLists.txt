@@ -22,7 +22,9 @@ set(SOURCE_FILES
     src/main.c
     src/reader_writer.c
     src/lightswitch.c
-    src/data.c)
+    src/data.c
+    src/read_thread.c
+    src/write_thread.c)
 
 find_package(Threads REQUIRED)
 

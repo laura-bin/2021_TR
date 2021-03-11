@@ -30,16 +30,19 @@ void free_data(struct data *data) {
     free(data);
 }
 
-int read_data(struct data *data, int reader_id) {
-    printf("reader %d reads %3d\n", reader_id, data->counter);
-    return data->counter < data->max ? 0 : 1;
+int read_data(void *params) {
+    struct read_params *p = (struct read_params *)params;
+    printf("reader %d reads %3d\n", p->reader_id, p->data->counter);
+    return p->data->counter < p->data->max ? 0 : 1;
 }
 
-int write_data(struct data *data, int value, int writer_id) {
-    data->counter += value;
-    if (data->counter > data->max) {
-        data->counter = data->max;
+int write_data(void *params) {
+    struct write_params *p = (struct write_params *)params;
+    p->data->counter += p->increment_value;
+    if (p->data->counter > p->data->max) {
+        p->data->counter = p->data->max;
     }
-    printf("writer %d writes %3d TOTAL> %3d\n", writer_id, value, data->counter);
-    return data->counter < data->max ? 0 : 1;
+    printf("writer %d writes %3d TOTAL> %3d\n", p->writer_id,
+                p->increment_value, p->data->counter);
+    return p->data->counter < p->data->max ? 0 : 1;
 }

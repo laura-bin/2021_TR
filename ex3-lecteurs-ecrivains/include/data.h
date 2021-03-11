@@ -3,10 +3,11 @@
  * Exercice 3 : Lecteurs - Ecrivains
  * =================================
  * 
- * Data structure:
- *  - creation and deletion
- *  - read data
- *  - write data
+ * Data structure
+ * Functions parameters structures
+ * Data creation and deletion function prototypes
+ * Read data function prototype
+ * Write data function prototype
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
@@ -14,6 +15,18 @@
 struct data {
     int counter;
     int max;
+};
+
+/* Read function parameters */
+struct read_params {
+    struct data *data;      // data to read
+    int reader_id;          // calling thread id
+};
+
+struct write_params {
+    struct data *data;      // data to read
+    int increment_value;    // increment value
+    int writer_id;          // calling thread id
 };
 
 /**
@@ -36,25 +49,18 @@ void free_data(struct data *data);
 /**
  * Displays the data counter on the standard output
  * 
- * @param data: data to display
- * @param reader_id: calling thread id
- * 
  * @return either
  *      0 if the counter is less than max
  *      1 if the counter is greater than or equal to the value
  */
-int read_data(struct data *data, int reader_id);
+int read_data(void *params);
 
 /**
  * Increments the data counter with a given value
  * (limited to the max value)
  * 
- * @param data: data structure to increment
- * @param value: increment value
- * @param writer_id: calling thread id
- * 
  * @return either
  *      0 if the counter is less than max
  *      1 if the counter is greater than or equal to the value
  */
-int write_data(struct data *data, int value, int writer_id);
+int write_data(void *params);

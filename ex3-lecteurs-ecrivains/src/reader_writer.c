@@ -13,58 +13,74 @@
 
 #include "reader_writer.h"
 
-void *read_thread(void *read_thread_params) {
-    int sleep_time;
-    int end = 0;
+struct sync_rw *init_rw(void) {
+    struct sync_rw *rw;
 
-    // copy the parameters then unlock the mutex
-    struct read_thread_params params = *((struct read_thread_params *)read_thread_params);
-    pthread_mutex_unlock(params.mutex);
-
-    while (!end) {
-        sleep_time = rand() % 2000 + 1;
-        usleep(sleep_time);
-
-        // hold the no writer semaphore
-        sem_wait(params.no_readers);
-        lock_lightswitch(params.ls, params.no_writers);
-        sem_post(params.no_readers);
-
-        // critical section: read the data
-        end = params.read_data(params.shared_data, params.reader_id);
-
-        // turn off the lightswitch (authorize the writers to update to the data)
-        unlock_lightswitch(params.ls, params.no_writers);
+    rw = malloc(sizeof(struct sync_rw));
+    if (rw == NULL) {
+        return NULL;
     }
 
+    if (sem_init(&rw->no_readers, 0, 1)) {
+        return NULL;
+    }
 
+    if (sem_init(&rw->no_writers, 0, 1)) {
+        return NULL;
+    }
 
-    return NULL;
+    rw->reader_switch = init_lightswitch();
+    if (rw->reader_switch == NULL) {
+        return NULL;
+    }
+
+    rw->writer_switch = init_lightswitch();
+    if (rw->writer_switch == NULL) {
+        return NULL;
+    }
+
+    return rw;
 }
 
-void *write_thread(void *write_thread_params) {
-    int sleep_time;
+void free_rw(struct sync_rw *rw) {
+    free_lightswitch(rw->writer_switch);
+    free_lightswitch(rw->reader_switch);
+    sem_destroy(&rw->no_writers);
+    sem_destroy(&rw->no_readers);
+    free(rw);
+}
+
+int sync_read(struct sync_rw *rw, int (*read_data)(void *params), void *read_params) {
     int end = 0;
 
-    // copy the parameters then unlock the mutex
-    struct write_thread_params params = *((struct write_thread_params *)write_thread_params);
-    pthread_mutex_unlock(params.mutex);
-    
-    while (!end) {
-        sleep_time = rand() % 1000 + 1;
-        usleep(sleep_time);
+    // hold the no writer semaphore
+    sem_wait(&rw->no_readers);
+    lock_lightswitch(rw->reader_switch, &rw->no_writers);
+    sem_post(&rw->no_readers);
 
-        // hold the no reader & no writer semaphores
-        // multiple writers can queue on no writer semaphore and readers are blocked
-        lock_lightswitch(params.ls, params.no_readers);
-        sem_wait(params.no_writers);
+    // critical section: read the data
+    end = read_data(read_params);
 
-        // critical section: increment the data
-        end = params.write_data(params.shared_data, params.writer_id, params.writer_id);
+    // turn off the lightswitch (authorize the writers to update to the data)
+    unlock_lightswitch(rw->reader_switch, &rw->no_writers);
 
-        // turn off the lightswitch (authorize readers to access the data)
-        sem_post(params.no_writers);
-        unlock_lightswitch(params.ls, params.no_readers);
-    }
-    return NULL;    
+    return end;
+}
+
+int sync_write(struct sync_rw *rw, int (*write_data)(void *params), void *write_params) {
+    int end = 0;
+
+    // hold the no reader & no writer semaphores
+    // multiple writers can queue on no writer semaphore and readers are blocked
+    lock_lightswitch(rw->writer_switch, &rw->no_readers);
+    sem_wait(&rw->no_writers);
+
+    // critical section: increment the data
+    end = write_data(write_params);
+
+    // turn off the lightswitch (authorize readers to access the data)
+    sem_post(&rw->no_writers);
+    unlock_lightswitch(rw->writer_switch, &rw->no_readers);
+
+    return end;
 }
