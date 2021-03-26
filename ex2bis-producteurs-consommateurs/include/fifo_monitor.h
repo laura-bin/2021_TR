@@ -3,7 +3,7 @@
  * Exercice 2 : Producteurs - Consommateurs
  * ========================================
  *
- * FIFO queue structure
+ * FIFO queue structure (monitor)
  * 
  * FIFO queue access functions prototypes:
  *  - push a new item in the FIFO queue
