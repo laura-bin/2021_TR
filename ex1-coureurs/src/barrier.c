@@ -1,3 +1,14 @@
+/** *************************************************************************************
+ * Exercice 1 : coureurs
+ * =====================
+ *
+ * Barrier implementation:
+ *  - creation and deletion
+ *  - wait function
+ * 
+ * TR 2021 - Laura Binacchi
+ ***************************************************************************************/
+
 #include <stdlib.h>
 #include <stdio.h>
 
