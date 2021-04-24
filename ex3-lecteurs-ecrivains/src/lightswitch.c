@@ -36,27 +36,27 @@ void free_lightswitch(struct lightswitch *ls) {
     free(ls);
 }
 
-void lock_lightswitch(struct lightswitch *ls, sem_t *sem) {
+void lock_lightswitch(struct lightswitch *ls, pthread_mutex_t *mutex) {
     // increment the number of threads in the critical section
     pthread_mutex_lock(&ls->counter_mutex);
     ls->counter += 1;
 
     // the first thread locks the access to the critical section
     if (ls->counter == 1) {
-        sem_wait(sem);
+        pthread_mutex_lock(mutex);
         // puts("lightswitch locked");
     }
     pthread_mutex_unlock(&ls->counter_mutex);
 }
 
-void unlock_lightswitch(struct lightswitch *ls, sem_t *sem) {
+void unlock_lightswitch(struct lightswitch *ls, pthread_mutex_t *mutex) {
     // decrement the number of threads in the critical section
     pthread_mutex_lock(&ls->counter_mutex);
     ls->counter -= 1;
 
     // the last thread signals the free access to the data
     if (!ls->counter) {
-        sem_post(sem);
+        pthread_mutex_unlock(mutex);
         // puts("lightswitch unlocked");
     }
     pthread_mutex_unlock(&ls->counter_mutex);

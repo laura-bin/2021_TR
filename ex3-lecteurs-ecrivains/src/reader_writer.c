@@ -21,11 +21,11 @@ struct sync_rw *init_rw(void) {
         return NULL;
     }
 
-    if (sem_init(&rw->no_readers, 0, 1)) {
+    if (pthread_mutex_init(&rw->no_readers, NULL)) {
         return NULL;
     }
 
-    if (sem_init(&rw->no_writers, 0, 1)) {
+    if (pthread_mutex_init(&rw->no_writers, NULL)) {
         return NULL;
     }
 
@@ -45,8 +45,8 @@ struct sync_rw *init_rw(void) {
 void free_rw(struct sync_rw *rw) {
     free_lightswitch(rw->writer_switch);
     free_lightswitch(rw->reader_switch);
-    sem_destroy(&rw->no_writers);
-    sem_destroy(&rw->no_readers);
+    pthread_mutex_destroy(&rw->no_readers);
+    pthread_mutex_destroy(&rw->no_writers);
     free(rw);
 }
 
@@ -54,9 +54,9 @@ int sync_read(struct sync_rw *rw, int (*read_data)(void *params), void *read_par
     int end = 0;
 
     // hold the no writer semaphore
-    sem_wait(&rw->no_readers);
+    pthread_mutex_lock(&rw->no_readers);
     lock_lightswitch(rw->reader_switch, &rw->no_writers);
-    sem_post(&rw->no_readers);
+    pthread_mutex_unlock(&rw->no_readers);
 
     // critical section: read the data
     end = read_data(read_params);
@@ -73,13 +73,13 @@ int sync_write(struct sync_rw *rw, int (*write_data)(void *params), void *write_
     // hold the no reader & no writer semaphores
     // multiple writers can queue on no writer semaphore and readers are blocked
     lock_lightswitch(rw->writer_switch, &rw->no_readers);
-    sem_wait(&rw->no_writers);
+    pthread_mutex_lock(&rw->no_writers);
 
     // critical section: increment the data
     end = write_data(write_params);
 
     // turn off the lightswitch (authorize readers to access the data)
-    sem_post(&rw->no_writers);
+    pthread_mutex_unlock(&rw->no_writers);
     unlock_lightswitch(rw->writer_switch, &rw->no_readers);
 
     return end;

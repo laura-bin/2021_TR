@@ -40,15 +40,15 @@ void free_lightswitch(struct lightswitch *lightswitch);
  * the first thread entering into the critical section locks the access
  * 
  * @param lightswitch used to keep count of the entering threads
- * @param semaphore to lock
+ * @param mutex to lock
  */
-void lock_lightswitch(struct lightswitch *lightswitch, sem_t *semaphore);
+void lock_lightswitch(struct lightswitch *lightswitch, pthread_mutex_t *mutex);
 
 /**
  * Unlocks the critical section:
  * the last thread leaving the critical section unlocks the access
  * 
  * @param ligthswitch used to keep count of the leaving threads
- * @param semaphore to unlock
+ * @param mutex to unlock
  */
-void unlock_lightswitch(struct lightswitch *lightswitch, sem_t *semaphore);
+void unlock_lightswitch(struct lightswitch *lightswitch, pthread_mutex_t *mutex);

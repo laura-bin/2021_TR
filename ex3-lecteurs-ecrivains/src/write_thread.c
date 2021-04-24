@@ -67,4 +67,3 @@ void *create_writers(void *write_thread_params) {
     free(write_threads);
     return NULL;
 }
-

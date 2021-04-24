@@ -8,13 +8,15 @@
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
 
+#include <pthread.h>
+
 #include "data.h"
 #include "lightswitch.h"
 
 /* Synchronized read/write access */
 struct sync_rw {
-    sem_t no_readers;                   // 1 if no reader is in the critical section
-    sem_t no_writers;                   // 1 if no writer is in the critical section
+    pthread_mutex_t no_readers;         // no readers in the critical section: writers are free to access it
+    pthread_mutex_t no_writers;         // no writers in the critical section: readers are free to access it
     struct lightswitch *reader_switch;  // readers lightswitch (counts the readers in the critical section)
     struct lightswitch *writer_switch;  // writers lightswitch (counts the readers in the critical section)
 };

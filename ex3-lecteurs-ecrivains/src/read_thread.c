@@ -66,4 +66,3 @@ void *create_readers(void *read_thread_params) {
     free(read_threads);
     return NULL;
 }
-
