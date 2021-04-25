@@ -2,7 +2,7 @@
  * Exercice 3 : Lecteurs - Ecrivains
  * =================================
  * 
- * Threads functions implementation
+ * Reader-writer implementation with software writer priority
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "reader_writer.h"
+#include "reader_writer_priority.h"
 
 struct sync_rw *init_rw(void) {
     struct sync_rw *rw;

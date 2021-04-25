@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "reader_writer.h"
+#include "reader_writer_priority.h"
 #include "read_thead.h"
 #include "write_thread.h"
 

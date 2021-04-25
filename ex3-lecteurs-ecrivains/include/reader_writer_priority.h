@@ -3,7 +3,7 @@
  * Exercice 3 : Lecteurs - Ecrivains
  * =================================
  * 
- * Threads parameters structures and threads functions
+ * Reader writer synchronization object, read and write functions
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/

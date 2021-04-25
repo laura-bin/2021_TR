@@ -15,7 +15,7 @@
 
 #include "data.h"
 #include "read_thead.h"
-#include "reader_writer.h"
+#include "reader_writer_priority.h"
 
 void *read_thread(void *read_thread_params) {
     struct read_params read_params;

@@ -20,7 +20,7 @@ include_directories(PUBLIC include)
 
 set(SOURCE_FILES
     src/main.c
-    src/reader_writer.c
+    src/reader_writer_priority.c
     src/lightswitch.c
     src/data.c
     src/read_thread.c

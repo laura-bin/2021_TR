@@ -15,7 +15,7 @@
 
 #include "data.h"
 #include "write_thread.h"
-#include "reader_writer.h"
+#include "reader_writer_priority.h"
 
 void *write_thread(void *write_thread_params) {
     struct write_params write_params;
