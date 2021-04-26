@@ -1,0 +1,48 @@
+/** *************************************************************************************
+ * Lecteurs - Ecrivains
+ * ====================
+ * 
+ * Data structure functions implementation:
+ *  - creation and deletion
+ *  - read data
+ *  - write data
+ * 
+ * TR 2021 - Laura Binacchi
+ ***************************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "data.h"
+
+struct data *init_data(int max) {
+    struct data *data = malloc(sizeof(struct data));
+    if (data == NULL) {
+        return NULL;
+    }
+    memset(data, 0, sizeof(struct data));
+    data->max = max;
+    return data;
+}
+
+void free_data(struct data *data) {
+    free(data);
+}
+
+int read_data(void *params) {
+    struct read_params *p = (struct read_params *)params;
+    printf("reader %d reads %3d\n", p->reader_id, p->data->counter);
+    return p->data->counter < p->data->max ? 0 : 1;
+}
+
+int write_data(void *params) {
+    struct write_params *p = (struct write_params *)params;
+    p->data->counter += p->increment_value;
+    if (p->data->counter > p->data->max) {
+        p->data->counter = p->data->max;
+    }
+    printf("writer %d writes %3d TOTAL> %3d\n", p->writer_id,
+                p->increment_value, p->data->counter);
+    return p->data->counter < p->data->max ? 0 : 1;
+}
