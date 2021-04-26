@@ -26,6 +26,8 @@ void *read_thread(void *read_thread_params) {
     struct read_thread_params params = *((struct read_thread_params *)read_thread_params);
     pthread_mutex_unlock(params.mutex);
 
+    nice(params.niceness);
+
     read_params.data = params.shared_data;
     read_params.reader_id = params.reader_id;
 

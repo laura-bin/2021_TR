@@ -3,14 +3,17 @@
  * =================================
  * 
  * Reader threads: can be in the critical section simultaneously
- * Writer threads: have exclusive and priority access to the critical section
+ * Writer threads: have exclusive access to the critical section
  * 
  *  - readers should outnumber writers
  *  - the number of readers and the number of writers must be greater than 0
  *  - data counter is initialized at 0 and max value must be greater than 0
  *
  * arg[1]: count of reader threads
- * arg[2]: count of writer threads
+ * arg[2]: readers nice value
+ * arg[3]: count of writer threads
+ * arg[4]: writers nice value
+ * arg[5]: max data value
  * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
@@ -33,8 +36,8 @@ int main (int argc, char *argv[]) {
     int exit_code = 0;
 
     // test the args
-    if (argc != 4) {
-        fprintf(stderr, "usage: %s readers writers maxvalue\n", argv[0]);
+    if (argc != 6) {
+        fprintf(stderr, "usage: %s readers readers_niceness writers writers_niceness maxvalue\n", argv[0]);
         return 1;
     }
 
@@ -48,15 +51,31 @@ int main (int argc, char *argv[]) {
         goto end;
     }
 
+    // initialize readers niceness (test already implemented by the nice function)
+    read_thread_params.niceness = atoi(argv[2]);
+    if (read_thread_params.niceness < -20 || read_thread_params.niceness > 19) {
+        exit_code = 1;
+        fprintf(stderr, "invalid readers niceness\n");
+        goto end;
+    }
+
     // initialize the count of writers
-    if ((write_thread_params.writers_count = atoi(argv[2])) <= 0) {
+    if ((write_thread_params.writers_count = atoi(argv[3])) <= 0) {
         exit_code = 1;
         fprintf(stderr, "invalid writers count\n");
         goto end;
     }
 
+    // initialize writers niceness (test already implemented by the nice function)
+    write_thread_params.niceness = atoi(argv[4]);
+    if (write_thread_params.niceness < -20 || write_thread_params.niceness > 19) {
+        exit_code = 1;
+        fprintf(stderr, "invalid writers niceness\n");
+        goto end;
+    }
+
     // get the max data value
-    if ((max = atoi(argv[3])) <= 0) {
+    if ((max = atoi(argv[5])) <= 0) {
         exit_code = 1;
         fprintf(stderr, "invalid max value\n");
         goto end;

@@ -41,7 +41,7 @@ void lock_lightswitch(struct lightswitch *ls, pthread_mutex_t *mutex) {
     // the first thread locks the access to the critical section
     if (ls->counter == 1) {
         pthread_mutex_lock(mutex);
-        puts("lightswitch locked");
+        // puts("lightswitch locked");
     }
     pthread_mutex_unlock(&ls->counter_mutex);
 }
@@ -54,7 +54,7 @@ void unlock_lightswitch(struct lightswitch *ls, pthread_mutex_t *mutex) {
     // the last thread signals the free access to the data
     if (!ls->counter) {
         pthread_mutex_unlock(mutex);
-        puts("lightswitch unlocked");
+        // puts("lightswitch unlocked");
     }
     pthread_mutex_unlock(&ls->counter_mutex);
 }

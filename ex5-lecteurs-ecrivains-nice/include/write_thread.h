@@ -14,6 +14,7 @@
 struct write_thread_params {
     int writer_id;              // thread id
     int writers_count;          // number of threads
+    int niceness;               // nice value
     struct data *shared_data;   // data structure shared by readers and writers
     struct sync_rw *rw;         // synchronized read/write access structure
     pthread_mutex_t *mutex;     // parameters copy mutex
