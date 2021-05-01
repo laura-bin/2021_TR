@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
 #include <unistd.h>
 
 #include "data.h"
@@ -27,10 +28,14 @@ void *write_thread(void *write_thread_params) {
     pthread_mutex_unlock(params.mutex);
 
     nice(params.niceness);
+    // printf("w%d nice %d\n", params.writer_id, getpriority(PRIO_PROCESS, 0));
 
     write_params.data = params.shared_data;
     write_params.increment_value = params.writer_id;
     write_params.writer_id = params.writer_id;
+
+    // wait for all the threads to be created before starting to write
+    pthread_barrier_wait(params.barrier);
 
     while (!end) {
         sleep_time = rand() % 2000 + 1;

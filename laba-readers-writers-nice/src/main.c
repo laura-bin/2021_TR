@@ -15,6 +15,8 @@
  * arg[4]: writers nice value
  * arg[5]: max data value
  * 
+ * If a nice value is lower than 0, the program must be launched as sudo
+ * 
  * TR 2021 - Laura Binacchi
  ***************************************************************************************/
 
@@ -23,6 +25,7 @@
 
 #include "reader_writer.h"
 #include "read_thead.h"
+#include "statistics.h"
 #include "write_thread.h"
 
 int main (int argc, char *argv[]) {
@@ -33,11 +36,12 @@ int main (int argc, char *argv[]) {
     pthread_t writer_creator;
     pthread_mutex_t reader_params;
     pthread_mutex_t writer_params;
+    pthread_barrier_t barrier;
     int exit_code = 0;
 
     // test the args
     if (argc != 6) {
-        fprintf(stderr, "usage: %s readers readers_niceness writers writers_niceness maxvalue\n", argv[0]);
+        fprintf(stderr, "usage: %s readers readers_niceness writers writers_niceness max_value\n", argv[0]);
         return 1;
     }
 
@@ -81,11 +85,27 @@ int main (int argc, char *argv[]) {
         goto end;
     }
 
+    // open the log file
+    if (open_stat_file(read_thread_params.readers_count, read_thread_params.niceness,
+            write_thread_params.writers_count, write_thread_params.niceness, max)) {
+        fprintf(stderr, "error on stat file opening\n");
+        goto end;
+    }
+
     // initialize reader id
     read_thread_params.reader_id = 0;
 
     // initialize writer id
     write_thread_params.writer_id = 0;
+
+    // initialize the shared barrier
+    if (pthread_barrier_init(&barrier, NULL,
+        read_thread_params.readers_count + write_thread_params.writers_count)) {
+        exit_code = 1;
+        fprintf(stderr, "barrier initialization");
+        goto end_free_barrier;
+    }
+    read_thread_params.barrier = write_thread_params.barrier = &barrier;
 
     // initialize the shared data
     read_thread_params.shared_data = write_thread_params.shared_data = init_data(max);
@@ -136,6 +156,10 @@ int main (int argc, char *argv[]) {
 
     end_free_data:
     free_data(read_thread_params.shared_data);
+
+    end_free_barrier:
+    pthread_barrier_destroy(&barrier);
+    close_stats_file();
 
     end:
 

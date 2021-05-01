@@ -12,7 +12,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(Exercice5_Lecteurs_Ecrivains_Nice VERSION 1.0)
+project(ExA_Readers_Writers_Nice VERSION 1.0)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wpedantic -Wextra")
 
@@ -24,7 +24,8 @@ set(SOURCE_FILES
     src/lightswitch.c
     src/data.c
     src/read_thread.c
-    src/write_thread.c)
+    src/write_thread.c
+    src/statistics.c)
 
 find_package(Threads REQUIRED)
 

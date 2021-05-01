@@ -1,4 +1,8 @@
 build/
+stats/
+consignes.txt
+
+.vscode
 
 # Prerequisites
 *.d

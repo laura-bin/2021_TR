@@ -13,8 +13,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "data.h"
+#include "statistics.h"
 
 struct data *init_data(int max) {
     struct data *data = malloc(sizeof(struct data));
@@ -32,17 +34,27 @@ void free_data(struct data *data) {
 
 int read_data(void *params) {
     struct read_params *p = (struct read_params *)params;
-    printf("reader %d reads %3d\n", p->reader_id, p->data->counter);
+    int sleep_time = rand() % 2000 + 1;
+    
+    usleep(sleep_time);
+
+    printf("r %3d < %3d\n", p->reader_id, p->data->counter);
+    log_r_stat(p->reader_id);
     return p->data->counter < p->data->max ? 0 : 1;
 }
 
 int write_data(void *params) {
     struct write_params *p = (struct write_params *)params;
-    p->data->counter += p->increment_value;
+    int sleep_time = rand() % 2000 + 1;
+    
+    usleep(sleep_time);
+    
+    p->data->counter++; //p->increment_value;
     if (p->data->counter > p->data->max) {
         p->data->counter = p->data->max;
     }
-    printf("writer %d writes %3d TOTAL> %3d\n", p->writer_id,
-                p->increment_value, p->data->counter);
+    printf("w %3d > %3d (+%d)\n", p->writer_id,
+                p->data->counter, p->increment_value);
+    log_w_stat(p->writer_id);
     return p->data->counter < p->data->max ? 0 : 1;
 }

@@ -18,6 +18,7 @@ struct read_thread_params {
     struct data *shared_data;   // data structure shared by readers and writers
     struct sync_rw *rw;         // synchronized read/write access structure
     pthread_mutex_t *mutex;     // parameters copy mutex
+    pthread_barrier_t *barrier; // barrier shared with the writers (wait everyone is ready before starting)
 };
 
 /**

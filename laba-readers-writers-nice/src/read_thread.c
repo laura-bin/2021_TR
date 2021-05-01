@@ -11,6 +11,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
 #include <unistd.h>
 
 #include "data.h"
@@ -27,9 +28,13 @@ void *read_thread(void *read_thread_params) {
     pthread_mutex_unlock(params.mutex);
 
     nice(params.niceness);
+    // printf("r%d nice %d\n", params.reader_id, getpriority(PRIO_PROCESS, 0));
 
     read_params.data = params.shared_data;
     read_params.reader_id = params.reader_id;
+
+    // wait for all the threads to be created before starting to read
+    pthread_barrier_wait(params.barrier);
 
     while (!end) {
         sleep_time = rand() % 2000 + 1;
