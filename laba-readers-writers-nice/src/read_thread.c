@@ -38,7 +38,7 @@ void *read_thread(void *read_thread_params) {
 
     while (!end) {
         sleep_time = rand() % 2000 + 1;
-        usleep(sleep_time);
+        // usleep(sleep_time);
         end = sync_read(params.rw, read_data, &read_params);
     }
 

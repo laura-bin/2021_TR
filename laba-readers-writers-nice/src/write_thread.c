@@ -39,7 +39,7 @@ void *write_thread(void *write_thread_params) {
 
     while (!end) {
         sleep_time = rand() % 2000 + 1;
-        usleep(sleep_time);
+        // usleep(sleep_time);
         end = sync_write(params.rw, write_data, &write_params);
     }
 

@@ -36,7 +36,7 @@ int read_data(void *params) {
     struct read_params *p = (struct read_params *)params;
     int sleep_time = rand() % 2000 + 1;
     
-    usleep(sleep_time);
+    // usleep(sleep_time);
 
     printf("r %3d < %3d\n", p->reader_id, p->data->counter);
     log_r_stat(p->reader_id);
@@ -47,7 +47,7 @@ int write_data(void *params) {
     struct write_params *p = (struct write_params *)params;
     int sleep_time = rand() % 2000 + 1;
     
-    usleep(sleep_time);
+    // usleep(sleep_time);
     
     p->data->counter++; //p->increment_value;
     if (p->data->counter > p->data->max) {
