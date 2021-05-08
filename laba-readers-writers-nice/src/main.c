@@ -1,6 +1,6 @@
 /** *************************************************************************************
- * Exercice 3 : Lecteurs - Ecrivains
- * =================================
+ * Labo A : Lecteurs - Ecrivains
+ * =============================
  * 
  * Reader threads: can be in the critical section simultaneously
  * Writer threads: have exclusive access to the critical section
