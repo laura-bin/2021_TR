@@ -12,7 +12,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(ExA_Readers_Writers_Nice VERSION 1.0)
+project(LaboA_Readers_Writers_Nice VERSION 1.0)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wpedantic -Wextra")
 
