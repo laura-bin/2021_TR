@@ -27,8 +27,6 @@ void *read_thread(void *read_thread_params) {
     struct read_thread_params params = *((struct read_thread_params *)read_thread_params);
     pthread_mutex_unlock(params.mutex);
 
-    // printf("r%d nice %d\n", params.reader_id, getpriority(PRIO_PROCESS, 0));
-
     read_params.data = params.shared_data;
     read_params.reader_id = params.reader_id;
 
@@ -108,6 +106,7 @@ void *create_readers(void *read_thread_params) {
         pthread_join(read_threads[i], NULL);
     }
 
+    pthread_attr_destroy(&attr);
     free(read_threads);
     return NULL;
 }

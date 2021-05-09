@@ -27,8 +27,6 @@ void *write_thread(void *write_thread_params) {
     struct write_thread_params params = *((struct write_thread_params *)write_thread_params);
     pthread_mutex_unlock(params.mutex);
 
-    // printf("w%d nice %d\n", params.writer_id, getpriority(PRIO_PROCESS, 0));
-
     write_params.data = params.shared_data;
     write_params.increment_value = 1;
     write_params.writer_id = params.writer_id;
@@ -109,6 +107,8 @@ void *create_writers(void *write_thread_params) {
         pthread_join(write_threads[i], NULL);
     }
 
+    pthread_attr_destroy(&attr);
     free(write_threads);
     return NULL;
+
 }
