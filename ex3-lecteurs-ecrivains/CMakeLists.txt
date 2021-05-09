@@ -24,7 +24,8 @@ set(SOURCE_FILES
     src/lightswitch.c
     src/data.c
     src/read_thread.c
-    src/write_thread.c)
+    src/write_thread.c
+    src/statistics.c)
 
 find_package(Threads REQUIRED)
 
