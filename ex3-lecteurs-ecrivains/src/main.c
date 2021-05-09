@@ -20,6 +20,7 @@
 
 #include "reader_writer_priority.h"
 #include "read_thead.h"
+#include "statistics.h"
 #include "write_thread.h"
 
 int main (int argc, char *argv[]) {
@@ -59,6 +60,13 @@ int main (int argc, char *argv[]) {
     if ((max = atoi(argv[3])) <= 0) {
         exit_code = 1;
         fprintf(stderr, "invalid max value\n");
+        goto end;
+    }
+
+    // open the log file
+    if (open_stat_file(read_thread_params.readers_count,
+            write_thread_params.writers_count, max)) {
+        fprintf(stderr, "error on stat file opening\n");
         goto end;
     }
 
@@ -117,6 +125,7 @@ int main (int argc, char *argv[]) {
 
     end_free_data:
     free_data(read_thread_params.shared_data);
+    close_stats_file();
 
     end:
 
