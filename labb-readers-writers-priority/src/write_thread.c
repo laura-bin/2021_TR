@@ -110,5 +110,4 @@ void *create_writers(void *write_thread_params) {
     pthread_attr_destroy(&attr);
     free(write_threads);
     return NULL;
-
 }
