@@ -20,7 +20,6 @@
 
 void *read_thread(void *read_thread_params) {
     struct read_params read_params;
-    int sleep_time;
     int end = 0;
 
     // copy the parameters then unlock the mutex
@@ -37,8 +36,7 @@ void *read_thread(void *read_thread_params) {
     pthread_barrier_wait(params.barrier);
 
     while (!end) {
-        sleep_time = rand() % 2000 + 1;
-        // usleep(sleep_time);
+        usleep(100);
         end = sync_read(params.rw, read_data, &read_params);
     }
 

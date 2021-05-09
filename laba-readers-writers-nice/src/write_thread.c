@@ -20,7 +20,6 @@
 
 void *write_thread(void *write_thread_params) {
     struct write_params write_params;
-    int sleep_time;
     int end = 0;
 
     // copy the parameters then unlock the mutex
@@ -38,8 +37,7 @@ void *write_thread(void *write_thread_params) {
     pthread_barrier_wait(params.barrier);
 
     while (!end) {
-        sleep_time = rand() % 2000 + 1;
-        // usleep(sleep_time);
+        usleep(100);
         end = sync_write(params.rw, write_data, &write_params);
     }
 

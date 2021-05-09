@@ -45,9 +45,6 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
-    // fill the random
-    srand(time(NULL));
-
     // initialize the count of readers
     if ((read_thread_params.readers_count = atoi(argv[1])) <= 0) {
         exit_code = 1;
